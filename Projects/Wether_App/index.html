@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Static Template</title>
+    <script>
+      const apiKey = "57a3a1c245e533652a9a8b4b65a5d980";
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      };
+
+      const updateHistory = (city) => {
+        const savedData = localStorage.getItem("weatherHistory");
+
+        if (savedData) {
+          const parsed = JSON.parse(savedData);
+          parsed.cities.push(city);
+          localStorage.setItem("weatherHistory", JSON.stringify(parsed));
+        } else {
+          localStorage.setItem(
+            "weatherHistory",
+            JSON.stringify({ cities: [city] })
+          );
+        }
+      };
+
+      function displayWeather(parsed) {
+        const message =
+          '<img src="http://openweathermap.org/img/wn/' +
+          parsed.weather[0].icon +
+          '@2x.png" />The weather in ' +
+          parsed.name +
+          " is " +
+          parsed.main.temp +
+          "° Celsius.";
+        document.querySelector(".greeting").innerHTML = message;
+
+        updateHistory(parsed.name);
+        checkLocalStorage();
+      }
+
+      const fetchData = (query) =>
+        fetch(query)
+          .then(function (response) {
+            console.log(response);
+            return response.json();
+          })
+          .then(displayWeather);
+
+      function getWeather(event) {
+        var city = document.querySelector(".city_input").value;
+        var query =
+          "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+        query += city + "&appid=" + apiKey;
+
+        fetchData(query);
+      }
+
+      const getWeatherForLocation = (pos) => {
+        var crd = pos.coords;
+        let query =
+          "https://api.openweathermap.org/data/2.5/weather?units=metric&lat=";
+        query += crd.latitude;
+        query += "&lon=" + crd.longitude + "&appid=" + apiKey;
+
+        fetchData(query);
+      };
+
+      const permissionsError = (err) => {
+        console.warn(`ERROR(${err.code}): ${err.message}`);
+      };
+
+      const checkLocalStorage = () => {
+        const savedData = localStorage.getItem("weatherHistory");
+        if (savedData) {
+          const parsed = JSON.parse(savedData);
+          console.log(parsed);
+          let html = "";
+          parsed.cities.forEach(
+            (location) => (html += "<li>" + location + "</li>")
+          );
+          document.querySelector(".history").innerHTML = html;
+        }
+      };
+
+      function init() {
+        document
+          .querySelector(".btnShowWeather")
+          .addEventListener("click", getWeather);
+        document
+          .querySelector(".btnShowWeatherForLocation")
+          .addEventListener("click", () => {
+            navigator.geolocation.getCurrentPosition(
+              getWeatherForLocation,
+              permissionsError,
+              options
+            );
+          });
+        checkLocalStorage();
+      }
+    </script>
+  </head>
+  <body onload="init()">
+    <div id="content"></div>
+    <div>
+      <label
+        >Enter your city: <input class="city_input" type="text" required
+      /></label>
+      <button class="btnShowWeather">Show weather</button>
+      <button class="btnShowWeatherForLocation">Weather in my location</button>
+      <p class="greeting"></p>
+      <div>
+        <h3>Your recent searches:</h3>
+        <ul class="history"></ul>
+      </div>
+    </div>
+  </body>
+</html>
