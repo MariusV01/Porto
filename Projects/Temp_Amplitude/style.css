@@ -2,9 +2,9 @@
   font-family: "Helvetica";
   src: url(/Projects/Portfolio/fonts/Helvetica-Font/Helvetica.ttf);
 } */
-@import url(/Projects/Portfolio/fonts/Helvetica-Font/Helvetica.ttf);
-@import url(/Projects/Portfolio/css/partials/_variables.css);
-@import url(/Projects/Portfolio/css/partials/_global.css);
+@import url(/fonts/Helvetica-Font/Helvetica.ttf);
+@import url(/css/partials/_variables.css);
+@import url(/css/partials/_global.css);
 
 body {
   font-family: Helvetica;
